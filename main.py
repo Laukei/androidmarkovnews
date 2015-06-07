@@ -85,14 +85,14 @@ class AndroidApp(App):
 			self.stop_service()
 			self.root.current_screen.ids.toggler.background_color = [1,5/8.,.25,1]
 			self.root.current_screen.ids.toggler.text = 'Service shut down'
-			self.root.current_screen.ids.downloader.disabled = False
-			self.root.current_screen.ids.generator.disabled = False
+			self.root.current_screen.ids.downloader.disabled = True
+			self.root.current_screen.ids.generator.disabled = True
 		else:
 			self.start_service()
 			self.root.current_screen.ids.toggler.background_color = [5/8.,1,0.25,1]
 			self.root.current_screen.ids.toggler.text = 'Service running'
-			self.root.current_screen.ids.downloader.disabled = True
-			self.root.current_screen.ids.generator.disabled = True
+			self.root.current_screen.ids.downloader.disabled = False
+			self.root.current_screen.ids.generator.disabled = False
 			
 
 
