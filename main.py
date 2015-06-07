@@ -24,11 +24,7 @@ class FirstScreen(Screen):
 	textcolor = [0.25,0.25,0.25,1]
 	buttoncolor = [5/8.,1,0.25,1]
 	buttontextcolor = [1,1,1,1]
-	def update_db(self,*args):
-		osc.sendMsg('/some_api',['UPDATE_DB',url_address,],port=serviceport)
 
-	def generate_sentence(self,*args):
-		osc.sendMsg('/some_api',['GENERATE',],port=serviceport)
 
 class SecondScreen(Screen):
 	pass
@@ -44,7 +40,15 @@ class AndroidApp(App):
 		oscid = osc.listen(ipAddr='127.0.0.1', port=activityport)
 		osc.bind(oscid, self.some_api_callback, '/some_api')
 		Clock.schedule_interval(lambda *x: osc.readQueue(oscid), 0)
+		self.service_enabled = False
+		self.toggle_service()
 		return
+
+	def update_db(self,*args):
+		osc.sendMsg('/some_api',['UPDATE_DB',url_address,],port=serviceport)
+
+	def generate_sentence(self,*args):
+		osc.sendMsg('/some_api',['GENERATE',],port=serviceport)
 
 	def on_pause(self):
 		return True
@@ -66,6 +70,7 @@ class AndroidApp(App):
 	def stop_service(self,*args):
 		if platform == 'android':
 			self.service.stop()
+		self.service_enabled = False
 
 	def start_service(self,*args):
 		if platform == 'android':
@@ -73,6 +78,22 @@ class AndroidApp(App):
 			service = AndroidService('SRN Service','Generating you great headlines')
 			service.start('service started')
 			self.service = service
+		self.service_enabled = True
+
+	def toggle_service(self,*args):
+		if self.service_enabled == True:
+			self.stop_service()
+			self.root.current_screen.ids.toggler.background_color = [1,5/8.,.25,1]
+			self.root.current_screen.ids.toggler.text = 'Service shut down'
+			self.root.current_screen.ids.downloader.disabled = False
+			self.root.current_screen.ids.generator.disabled = False
+		else:
+			self.start_service()
+			self.root.current_screen.ids.toggler.background_color = [5/8.,1,0.25,1]
+			self.root.current_screen.ids.toggler.text = 'Service running'
+			self.root.current_screen.ids.downloader.disabled = True
+			self.root.current_screen.ids.generator.disabled = True
+			
 
 
 if __name__ == "__main__":
