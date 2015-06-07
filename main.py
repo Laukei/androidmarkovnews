@@ -9,6 +9,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.utils import platform
 from kivy.clock import Clock
 from kivy.lib import osc
+from kivy.graphics import Color, Rectangle
 
 import random
 import time
@@ -17,20 +18,17 @@ url_address = 'http://feeds.bbci.co.uk/news/rss.xml'
 activityport = 3001
 serviceport = 3000
 
-
 class FirstScreen(Screen):
+	bgcolor = [1,1,1,1]
+	textcolor = [0.25,0.25,0.25,1]
+	buttoncolor = [5/8.,1,0.25,1]
+	buttontextcolor = [1,1,1,1]
 	def update_db(self,*args):
 		osc.sendMsg('/some_api',['UPDATE_DB',url_address,],port=serviceport)
 
 	def generate_sentence(self,*args):
 		osc.sendMsg('/some_api',['GENERATE',],port=serviceport)
-'''
-	def generate_sentence(self,*args):
-		try:
-			self.ids.random_number.text = str(bml.processSentence(bml.genSentence(self.markov_graph)))
-		except AttributeError:
-			self.ids.random_number.text = str('you can\'t generate one until you UPDATE_DB')
-'''
+
 class SecondScreen(Screen):
 	pass
 
@@ -65,13 +63,15 @@ class AndroidApp(App):
 			self.root.current_screen.ids.random_number.text = str(message[4])
 
 	def stop_service(self,*args):
-		self.service.stop()
+		if platform == 'android':
+			self.service.stop()
 
 	def start_service(self,*args):
-		from android import AndroidService
-		service = AndroidService('SRN Service','Generating you great headlines')
-		service.start('service started')
-		self.service = service
+		if platform == 'android':
+			from android import AndroidService
+			service = AndroidService('SRN Service','Generating you great headlines')
+			service.start('service started')
+			self.service = service
 
 
 if __name__ == "__main__":

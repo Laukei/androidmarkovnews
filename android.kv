@@ -4,52 +4,65 @@ MyScreenManager:
 <FirstScreen>
 	name: 'first'
 	BoxLayout:
+		canvas.before:
+			Color:
+				rgba: root.bgcolor
+			Rectangle:
+				pos: self.pos
+				size: self.size
 		orientation: 'vertical'
 		Label:
+			color: root.textcolor
 			text: 'Skim Read News'
 			font_size: 120
 			size_hint_y: None
 			height: 150
 		Label:
+			color: root.textcolor
 			id: update_time
 			text: 'updated:'
 			font_size: 60		
 			size_hint_y: None
 			height: 80
 		ScrollView:
-
 			Label:
+				color: root.textcolor
 				id: random_number
 				text: ''
 				font_size: 80
 				text_size: self.size
 				#height: self.texture_size[1]    #this doesn't work for some reason...
 		BoxLayout:
+			orientation: 'vertical'
+			padding: 5
+			spacing: 5
 			size_hint_y: None
-			height: 200
+			height: 400
 			Button:
-				text: 'Download'
-				font_size: 80
-				on_release: root.update_db()
-			Button:
-				text: 'Generate'
-				font_size: 80
-				on_release: root.generate_sentence()
-		BoxLayout:
-			size_hint_y: None
-			height: 200
-			Button:
+				background_color: root.buttoncolor
 				text: 'Start'
 				font_size: 80
 				on_release: app.start_service()
 			Button:
+				background_color: root.buttoncolor
+				text: 'Download'
+				font_size: 80
+				on_release: root.update_db()
+			Button:
+				background_color: root.buttoncolor
+				text: 'Generate'
+				font_size: 80
+				on_release: root.generate_sentence()
+			Button:
+				background_color: root.buttoncolor
 				text: 'Stop'
 				font_size: 80
 				on_release: app.stop_service()
-		BoxLayout:
-			size_hint_y: None
-			height: 200
-			Button:
-				text: 'Settings'
-				font_size: 80
-				on_release: app.open_settings()
+		#BoxLayout:
+			#size_hint_y: None
+			#height: 200
+			#Button:
+				#background_color: root.buttoncolor
+				#text: 'Settings'
+				#font_size: 80
+				#on_release: app.open_settings()
