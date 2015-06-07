@@ -10,6 +10,7 @@ from kivy.utils import platform
 from kivy.clock import Clock
 from kivy.lib import osc
 from kivy.graphics import Color, Rectangle
+from kivy.metrics import Metrics
 
 import random
 import time

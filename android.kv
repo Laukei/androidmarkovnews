@@ -14,55 +14,57 @@ MyScreenManager:
 		Label:
 			color: root.textcolor
 			text: 'Skim Read News'
-			font_size: 120
+			font_size: '48dp'
 			size_hint_y: None
-			height: 150
+			height: '50dp'
 		Label:
 			color: root.textcolor
 			id: update_time
 			text: 'updated:'
-			font_size: 60		
+			font_size: '16dp'
 			size_hint_y: None
-			height: 80
-		ScrollView:
-			Label:
-				color: root.textcolor
-				id: random_number
-				text: ''
-				font_size: 80
-				text_size: self.size
-				#height: self.texture_size[1]    #this doesn't work for some reason...
+			height: '22dp'
+		BoxLayout:
+			padding: '12dp'
+			ScrollView:
+				Label:
+					color: root.textcolor
+					id: random_number
+					text: ''
+					font_size: '20dp'
+					text_size: self.size
+					#height: self.texture_size[1]    #this doesn't work for some reason...
 		BoxLayout:
 			orientation: 'vertical'
-			padding: 5
-			spacing: 5
+			padding: '12dp'
+			spacing: '8dp'
 			size_hint_y: None
-			height: 400
+			height: '210dp'
 			Button:
 				background_color: root.buttoncolor
 				text: 'Start'
-				font_size: 80
+				font_size: '36dp'
 				on_release: app.start_service()
 			Button:
 				background_color: root.buttoncolor
 				text: 'Download'
-				font_size: 80
+				font_size: '36dp'
 				on_release: root.update_db()
 			Button:
 				background_color: root.buttoncolor
 				text: 'Generate'
-				font_size: 80
+				font_size: '36dp'
 				on_release: root.generate_sentence()
 			Button:
 				background_color: root.buttoncolor
 				text: 'Stop'
-				font_size: 80
+				font_size: '36dp'
 				on_release: app.stop_service()
 		#BoxLayout:
 			#size_hint_y: None
-			#height: 200
+			#height: '200dp'
 			#Button:
 				#background_color: root.buttoncolor
 				#text: 'Settings'
-				#font_size: 80
+				#font_size: '80dp'
 				#on_release: app.open_settings()
