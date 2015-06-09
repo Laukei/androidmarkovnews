@@ -60,7 +60,7 @@ class AndroidApp(App):
 		self.toggle_service()
 		self.load_settings()
 		self.chosen_locale = self.config.get('example','optionsexample')
-		self.tts_enabled = self.config.get('example','boolexample')
+		self.tts_enabled = bool(int(self.config.get('example','boolexample')))
 		return
 
 	def load_settings(self,*args):
@@ -100,8 +100,10 @@ class AndroidApp(App):
 		osc.sendMsg('/some_api',['GENERATE',],port=serviceport)
 
 	def read_sentence(self,*args):
-		self.tts.setLanguage(self.locales[self.chosen_locale])
-		self.tts.speak(self.root.current_screen.ids.random_number.text, self.TextToSpeech.QUEUE_FLUSH, None)
+		if platform == 'android':
+			self.tts.setLanguage(self.locales[self.chosen_locale])
+			self.tts.speak(self.root.current_screen.ids.random_number.text, self.TextToSpeech.QUEUE_FLUSH, None)
+		print 'read:',self.root.current_screen.ids.random_number.text
 
 	def on_pause(self):
 		return True
@@ -111,17 +113,21 @@ class AndroidApp(App):
 
 	def some_api_callback(self, message, *args):
 		print("got a message! %s" % message)
-		print self.root.current_screen.ids
+		#print self.root.current_screen.ids
 		if message[2] == 'UPDATE_DB':
-			if message[3] == 'success':
+			if message[3] == 'success' and self.service_enabled == True:
 				self.root.current_screen.ids.update_time.text = 'updated: '+str(message[4])
 				self.root.current_screen.ids.generator.disabled = False
 				self.root.current_screen.ids.downloader.disabled = False
+				self.root.current_screen.ids.downloader.text = 'Download'
+			if message[3] == 'success' and self.service_enabled == False:
 				self.root.current_screen.ids.downloader.text = 'Download'
 			elif message[3] == 'fail':
 				self.root.current_screen.ids.update_time.text = 'update failed, are you connected to the net?'
 		elif message[2] == 'GENERATE':
 			self.root.current_screen.ids.random_number.text = str(message[4])
+			print 'self.tts_enabled:',self.tts_enabled
+			print 'truth:', self.tts_enabled == True
 			if self.tts_enabled == True:
 				self.read_sentence()
 

@@ -42,7 +42,6 @@ def process_result(result):
 
 markov_graph = []
 def on_success(req,result):
-	print 'whaaaa'
 	#self.ids.update_time.text = 'updated: processing...'
 	global markov_graph
 	markov_graph = process_result(result)
@@ -60,8 +59,15 @@ def update_db(url_address,*args):
 
 def generate_sentence(*args):
 	try:
-		sentence = str(bml.processSentence(bml.genSentence(markov_graph)))
-		osc.sendMsg('/some_api',['GENERATE','success',sentence],port=activityport)
+		for i in range(10): # try 10 times (REALLY BAD WAY TO STOP UNICODEENCODEERROR)
+			try:
+				sentence_bits = bml.genSentence(markov_graph)
+				sentence = str(bml.processSentence(sentence_bits))
+				osc.sendMsg('/some_api',['GENERATE','success',sentence],port=activityport)
+				return
+			except UnicodeEncodeError:
+				pass
+		osc.sendMsg('/some_api',['GENERATE','fail','stuck escaping unicode (python2.7 sucks at unicode)'],port=activityport)
 	except AttributeError:
 		osc.sendMsg('/some_api',['GENERATE','fail','you can\'t generate one until you UPDATE_DB'],port=activityport)
 
