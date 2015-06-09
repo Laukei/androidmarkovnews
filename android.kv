@@ -14,9 +14,9 @@ MyScreenManager:
 		Label:
 			color: root.textcolor
 			text: 'Skim Read News'
-			font_size: '48dp'
+			font_size: '36sp'
 			size_hint_y: None
-			height: '50dp'
+			height: '40dp'
 		Label:
 			color: root.textcolor
 			id: update_time
@@ -31,7 +31,7 @@ MyScreenManager:
 					color: root.textcolor
 					id: random_number
 					text: ''
-					font_size: '20dp'
+					font_size: '20sp'
 					text_size: self.size
 					#height: self.texture_size[1]    #this doesn't work for some reason...
 		BoxLayout:
@@ -39,35 +39,45 @@ MyScreenManager:
 			padding: '12dp'
 			spacing: '8dp'
 			size_hint_y: None
-			height: '210dp'
+			height: '150dp'
 			#Button:
 				#background_color: root.buttoncolor
 				#text: 'Start'
 				#font_size: '36dp'
 				#on_release: app.start_service()
 			Button:
-				id: downloader
-				background_color: root.buttoncolor
-				text: 'Download'
-				font_size: '36dp'
-				on_release: app.update_db()
-			Button:
 				id: generator
 				background_color: root.buttoncolor
 				text: 'Generate'
-				font_size: '36dp'
+				font_size: '24sp'
 				on_release: app.generate_sentence()
+			Button:
+				id: downloader
+				background_color: root.buttoncolor
+				text: 'Download'
+				font_size: '24sp'
+				on_release: app.update_db()
 			#Button:
 				#background_color: root.buttoncolor
 				#text: 'Stop'
-				#font_size: '36dp'
+				#font_size: '24sp'
 				#on_release: app.stop_service()
-			Button:
-				id: toggler
-				background_color: root.buttoncolor
-				text: ''
-				font_size: '36dp'
-				on_release: app.toggle_service()
+			BoxLayout:
+				orientation: 'horizontal'
+				spacing: '8dp'
+				#size_hint_y: None
+				#height: '60dp'
+				Button:
+					id: toggler
+					background_color: root.buttoncolor
+					text: ''
+					font_size: '24sp'
+					on_release: app.toggle_service()
+				Button:
+					background_color: root.buttoncolor
+					text: 'Settings'
+					font_size: '24sp'
+					on_release: app.open_settings()
 		#BoxLayout:
 			#size_hint_y: None
 			#height: '200dp'

@@ -36,19 +36,72 @@ class AndroidApp(App):
 	def build(self):
 		if platform == 'android':
 			self.start_service()
+			from jnius import autoclass
+			self.Locale = autoclass('java.util.Locale')
+			self.PythonActivity = autoclass('org.renpy.android.PythonActivity')
+			self.TextToSpeech = autoclass('android.speech.tts.TextToSpeech')
+			self.tts = self.TextToSpeech(self.PythonActivity.mActivity, None)
+			self.locales = {
+				'CANADA':self.Locale.CANADA,
+				'FRANCE':self.Locale.FRANCE,
+				'GERMANY':self.Locale.GERMANY,
+				'ITALY':self.Locale.ITALY,
+				'JAPAN':self.Locale.JAPAN,
+				'KOREA':self.Locale.KOREA,
+				'CHINA':self.Locale.SIMPLIFIED_CHINESE,
+				'UK':self.Locale.UK,
+				'US':self.Locale.US
+				}
 		osc.init()
 		oscid = osc.listen(ipAddr='127.0.0.1', port=activityport)
 		osc.bind(oscid, self.some_api_callback, '/some_api')
 		Clock.schedule_interval(lambda *x: osc.readQueue(oscid), 0)
 		self.service_enabled = False
 		self.toggle_service()
+		self.load_settings()
+		self.chosen_locale = self.config.get('example','optionsexample')
+		self.tts_enabled = self.config.get('example','boolexample')
 		return
+
+	def load_settings(self,*args):
+		from default_settings import settings_defaults
+		self.loaded_settings = settings_defaults
+
+	def build_config(self,config):
+		config.setdefaults('example',{
+			'boolexample':True,
+			'optionsexample':'UK',
+			'stringexample': url_address
+			})
+
+	def build_settings(self,settings):
+		settings.add_json_panel('Skim Read News',
+			self.config,
+			data=self.loaded_settings)
+		self.use_kivy_settings = False
+
+	def on_config_change(self,config,section,key,value):
+		#print config,section,key,value
+		if key == 'boolexample':
+			self.tts_enabled = bool(int(value))
+		if key == 'stringexample':
+			self.url_address = value
+		if key == 'optionsexample':
+			self.chosen_locale = value
 
 	def update_db(self,*args):
 		osc.sendMsg('/some_api',['UPDATE_DB',url_address,],port=serviceport)
+		self.root.current_screen.ids.generator.disabled = True
+		self.root.current_screen.ids.update_time.text = 'updating... (takes a while)'
+		self.root.current_screen.ids.downloader.disabled = True
+		self.root.current_screen.ids.downloader.text = 'Downloading...'
 
 	def generate_sentence(self,*args):
 		osc.sendMsg('/some_api',['GENERATE',],port=serviceport)
+
+	def read_sentence(self,*args):
+		self.tts.setLanguage(self.locales[self.chosen_locale])
+		self.tts.speak(self.root.current_screen.ids.random_number.text, self.TextToSpeech.QUEUE_FLUSH, None)
 
 	def on_pause(self):
 		return True
@@ -62,10 +115,15 @@ class AndroidApp(App):
 		if message[2] == 'UPDATE_DB':
 			if message[3] == 'success':
 				self.root.current_screen.ids.update_time.text = 'updated: '+str(message[4])
+				self.root.current_screen.ids.generator.disabled = False
+				self.root.current_screen.ids.downloader.disabled = False
+				self.root.current_screen.ids.downloader.text = 'Download'
 			elif message[3] == 'fail':
 				self.root.current_screen.ids.update_time.text = 'update failed, are you connected to the net?'
 		elif message[2] == 'GENERATE':
 			self.root.current_screen.ids.random_number.text = str(message[4])
+			if self.tts_enabled == True:
+				self.read_sentence()
 
 	def stop_service(self,*args):
 		if platform == 'android':
@@ -84,15 +142,15 @@ class AndroidApp(App):
 		if self.service_enabled == True:
 			self.stop_service()
 			self.root.current_screen.ids.toggler.background_color = [1,5/8.,.25,1]
-			self.root.current_screen.ids.toggler.text = 'Service shut down'
+			self.root.current_screen.ids.toggler.text = 'Service OFF'
 			self.root.current_screen.ids.downloader.disabled = True
-			self.root.current_screen.ids.generator.disabled = True
+			self.root.current_screen.ids.downloader.text = 'Download'
 		else:
 			self.start_service()
 			self.root.current_screen.ids.toggler.background_color = [5/8.,1,0.25,1]
-			self.root.current_screen.ids.toggler.text = 'Service running'
+			self.root.current_screen.ids.toggler.text = 'Service ON'
 			self.root.current_screen.ids.downloader.disabled = False
-			self.root.current_screen.ids.generator.disabled = False
+			self.root.current_screen.ids.generator.disabled = True
 			
 
 
