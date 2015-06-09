@@ -144,7 +144,7 @@ class AndroidApp(App):
 			self.root.current_screen.ids.toggler.background_color = [1,5/8.,.25,1]
 			self.root.current_screen.ids.toggler.text = 'Service OFF'
 			self.root.current_screen.ids.downloader.disabled = True
-			self.root.current_screen.ids.downloader.text = 'Download'
+			self.root.current_screen.ids.generator.disabled = True
 		else:
 			self.start_service()
 			self.root.current_screen.ids.toggler.background_color = [5/8.,1,0.25,1]
