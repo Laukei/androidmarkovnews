@@ -17,6 +17,10 @@ MyScreenManager:
 			font_size: '36sp'
 			size_hint_y: None
 			height: '40dp'
+		#ProgressBar:
+			#id: pb
+			#size_hint_y: None
+			#height: '10dp'
 		Label:
 			color: root.textcolor
 			id: update_time
@@ -25,7 +29,16 @@ MyScreenManager:
 			size_hint_y: None
 			height: '22dp'
 		BoxLayout:
+			orientation: 'vertical'
 			padding: '12dp'
+			ScrollView:
+				Label:
+					color: root.textcolor
+					id: headline
+					text: ''
+					font_size: '30sp'
+					text_size: self.size
+					height: self.texture_size[1]
 			ScrollView:
 				Label:
 					color: root.textcolor

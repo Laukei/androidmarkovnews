@@ -34,17 +34,25 @@ def processUrlData(url_data):
 	return titledata,descdata
 
 def process_result(result):
+	osc.sendMsg('/some_api', ['UPDATE_DB','progress','downloaded data...', ], port=activityport)
 	titledata, descdata = processUrlData(result)
 	descdataset = bml.genSetOfWords(descdata)
+	titledataset = bml.genSetOfWords(titledata)
+	osc.sendMsg('/some_api', ['UPDATE_DB','progress','created datasets...', ], port=activityport)
 	markov_graph = bml.genMarkov(descdata,descdataset)
+	osc.sendMsg('/some_api', ['UPDATE_DB','progress','created description set...', ], port=activityport)
+	markov_title = bml.genMarkov(titledata,titledataset)
+	osc.sendMsg('/some_api', ['UPDATE_DB','progress','created headline set...', ], port=activityport)
 	#self.ids.random_number.text = str(result[500:800])
-	return markov_graph
+	return markov_title, markov_graph
 
 markov_graph = []
+markov_title = []
 def on_success(req,result):
 	#self.ids.update_time.text = 'updated: processing...'
 	global markov_graph
-	markov_graph = process_result(result)
+	global markov_title
+	markov_title, markov_graph = process_result(result)
 	osc.sendMsg('/some_api', ['UPDATE_DB','success',asctime(localtime()), ], port=activityport)
 	print 'success'
 	
@@ -57,20 +65,26 @@ def update_db(url_address,*args):
 	#self.ids.update_time.text = 'updated: downloading...'
 	UrlRequest(url_address, on_success, on_fail).wait()
 
-def generate_sentence(*args):
+def gen_sentence_from_markov(graph):
 	try:
 		for i in range(10): # try 10 times (REALLY BAD WAY TO STOP UNICODEENCODEERROR)
 			try:
-				sentence_bits = bml.genSentence(markov_graph)
+				sentence_bits = bml.genSentence(graph)
 				sentence = str(bml.processSentence(sentence_bits))
-				osc.sendMsg('/some_api',['GENERATE','success',sentence],port=activityport)
-				return
+				return sentence
 			except UnicodeEncodeError:
 				pass
-		osc.sendMsg('/some_api',['GENERATE','fail','stuck escaping unicode (python2.7 sucks at unicode)'],port=activityport)
 	except AttributeError:
-		osc.sendMsg('/some_api',['GENERATE','fail','you can\'t generate one until you UPDATE_DB'],port=activityport)
+		osc.sendMsg('/some_api',['GENERATE','fail','you can\'t generate one until you UPDATE_DB','FAILURE'],port=activityport)
+		return None
+	osc.sendMsg('/some_api',['GENERATE','fail','stuck escaping unicode (python2.7 sucks at unicode)','FAILURE'],port=activityport)
+	return None
 
+def generate_sentence(*args):
+	sentence_desc = gen_sentence_from_markov(markov_graph)
+	sentence_title = gen_sentence_from_markov(markov_title)
+	if sentence_desc != None and sentence_title != None:
+		osc.sendMsg('/some_api',['GENERATE','success',sentence_title,sentence_desc],port=activityport)
 
 if __name__ == '__main__':
 	osc.init()
