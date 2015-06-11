@@ -103,7 +103,7 @@ class AndroidApp(App):
 	def read_sentence(self,*args):
 		if platform == 'android':
 			self.tts.setLanguage(self.locales[self.chosen_locale])
-			self.tts.speak(self.root.current_screen.ids.headline.text, text.TextToSpeech.QUEUE_FLUSH, None)
+			self.tts.speak(self.root.current_screen.ids.headline.text, self.TextToSpeech.QUEUE_FLUSH, None)
 			self.tts.speak(self.root.current_screen.ids.random_number.text, self.TextToSpeech.QUEUE_ADD, None)
 		print 'read:',self.root.current_screen.ids.headline.text,self.root.current_screen.ids.random_number.text
 
